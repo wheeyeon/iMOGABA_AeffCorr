@@ -3,6 +3,7 @@
 # Will Update to use station data from AN table directly in the future
 # Assumes ANT1 = KTN, ANT2 = KUS, ANT3 = KYS
 
+import os
 from astropy.io import fits, ascii
 from astropy.time import Time
 import astropy.units as u
@@ -27,8 +28,7 @@ def get_angle(val_deg, val_min, val_sec):
 	return output
 
 def tele_loc_lib(telename):
-    teleloclib={'GBT'      : EarthLocation(lat = get_angle(38,25,59), lon = -79.839722*u.deg, height = 807.43*u.m),
-                'nobeyama' : EarthLocation.from_geocentric(x=-3871025.4987, y=3428107.3984, z=3724038.7361, unit=u.m),
+    teleloclib={'nobeyama' : EarthLocation.from_geocentric(x=-3871025.4987, y=3428107.3984, z=3724038.7361, unit=u.m),
                 'takahagi' : EarthLocation.from_geocentric(x=-3961881.8250, y=3243372.4800, z=3790687.4490, unit=u.m),
                 'tianma'   : EarthLocation.from_geocentric(x=-2826708.6380, y=4679237.0440, z=3274667.5330, unit=u.m),
                 'nanshan'  : EarthLocation.from_geocentric(x=  228310.1700, y=4631922.7550, z=4367064.0740, unit=u.m),
@@ -39,11 +39,10 @@ def tele_loc_lib(telename):
                 'kvnyonsei': EarthLocation.from_geocentric(x=-3042281.0183, y=4045902.6730, z=3867374.3296, unit=u.m),
                 'kvnulsan' : EarthLocation.from_geocentric(x=-3287268.6453, y=4023450.1367, z=3687379.9886, unit=u.m),
                 'kvntamna' : EarthLocation.from_geocentric(x=-3171731.6665, y=4292678.5393, z=3481038.7880, unit=u.m),
-                'mopra'    : EarthLocation.from_geocentric(x=-4682769.05850, y=2802619.04217, z=-3291759.33837, unit=u.m),
-                'yebes'    : EarthLocation.from_geocentric(x=4848761.7579, y=-261484.0570, z=4123085.1343, unit=u.m),}
+                }
     return teleloclib[telename]
 
-def kys_anomoly(obs_date):
+def kys_anomoly(obs_date, obs_freq):
     # KYS scaling factor due to K-band phase instability
     # obs_date in JD
     # Notes : IM50 SF may be different per source
@@ -55,7 +54,10 @@ def kys_anomoly(obs_date):
     if len(kvn_epoch_final) == 0:
         return ('Unknown',1)
     else:
-        return (kvn_epoch_final['Epoch'][0], kvn_epoch_final['KYS_SF'][0])
+        if obs_freq < 30:
+            return (kvn_epoch_final['Epoch'][0], kvn_epoch_final['KYS_SF'][0])
+        else:
+            return (kvn_epoch_final['Epoch'][0], 1)
 
 def get_gc_info(obs_date, obs_freq):
     # For returning old and new gc values to use
@@ -139,7 +141,7 @@ def scale_data(file_name, save_name):
     obs_date   = data_headr.get('DATE-OBS')
     obs_source = data_headr.get('OBJECT')
     obs_cfreq  = data_headr.get('CRVAL4')*1.e-9 # Hz to GHz
-    obsepochif = kys_anomoly(data_table[0]['DATE'])
+    obsepochif = kys_anomoly(data_table[0]['DATE'], obs_cfreq)
     print('Found source {0}, observed on {1} ({2}) at {3:.1f} GHz'.format(obs_source, obs_date, obsepochif[0], obs_cfreq))
     if Time(obs_date) < Time('2015-08-31'):
         print('Observation date not supported by this code.')
