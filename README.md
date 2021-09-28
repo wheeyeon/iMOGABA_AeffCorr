@@ -4,3 +4,4 @@ This code uses the Python libraries astropy and numpy to calculate the observed 
 This, along with the ANTAB DPFU+GC and newly-determined DPFU+GC are used to re-calibrate each visibility.
 The observation date, frequency, and source coordinates are read from the UVFITS header. These values must be accurate. 
 For station coordinates, we use the values presented in the EAVN status report, assuming that ANT1, 2, 3 are KTN, KUS, and KYS respectively. The code will need some minor edits if this is not the case. Future updates will read the station information directly from the AN table.
+The KVNSD_Tbin_imogaba.csv contains the start and end date of each iMOGABA epoch, as well as an additional scaling factor for KYS K-band observations to correct for additional flux loss most likely caused by phase instability for certain epochs.
