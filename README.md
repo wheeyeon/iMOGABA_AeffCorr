@@ -8,4 +8,4 @@ The KVNSD_Tbin_imogaba.csv contains the start and end date of each iMOGABA epoch
 Ultimately, the code is run by passing the path of the input and output UVFITS file to the function "scale_data()". One may edit the code manually for each UVFITS file, or alternatively create a list of input and output file paths (ex : 
 total_file_list = os.popen("ls %s*.KVN27"%data_dir).read().split("\n")[:-1]) and iterate over this list.
 The typical time required to correct an individual iMOGABA UVFITS file is approximately 1 ~ 2 minutes. However, it was noted that this code is very slow when run on Windows, with times exceeding a few hours per source. We recommend that this code be run on a Linux environment. 
-# Note : The pdf document is slightly outdated, but it still provides a general overview of the situation.
+# Note : The pdf document is slightly outdated, but it still provides a general overview of the issue.
