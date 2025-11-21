@@ -9,3 +9,4 @@ Ultimately, the code is run by passing the path of the input and output UVFITS f
 total_file_list = os.popen("ls %s*.KVN27"%data_dir).read().split("\n")[:-1]) and iterate over this list.
 The typical time required to correct an individual iMOGABA UVFITS file is approximately 1 ~ 2 minutes. However, it was noted that this code is very slow when run on Windows, with times exceeding a few hours per source. We recommend that this code be run on a Linux environment. 
 # Note : The pdf document is slightly outdated, but it still provides a general overview of the issue.
+# Note : Two major errors have been found and fixed on 2025 November 21. You may wish to re-calibrate your data (see 251121_update.pdf in docs).
