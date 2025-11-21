@@ -97,7 +97,8 @@ def get_gc_info(obs_date, obs_freq):
         elif Time(obs_date) < Time('2017-05-19'): #<--date may be off by couple of days
             wycjupgc3 = (0.06279863, 0.94946968, 0.00208465,-0.00002150)# KYS
         else:
-            wycjupgc3 = (0.08013851, 0.99688671, 0.00014536,-0.00002150)# KYS
+            #wycjupgc3 = (0.08013851, 0.99688671, 0.00014536,-0.00002150)# KYS
+            wycjupgc3 = (0.08013851, 0.94946968, 0.00208465,-0.00002150)# KYS
         if Time(obs_date) < Time('2016-11-20'): #<--date may be off
             wycjupgc1 = (0.07375735, 0.97748671, 0.00100397,-0.00001119)# KTN
         else:
@@ -130,6 +131,11 @@ def gain_curve_poly(ele,gc_param_dat):
     # ele : elevation in degrees.
     dpfu,a0,a1,a2 = gc_param_dat
     return  dpfu*(a0*ele**2 + a1*ele + a2)
+
+def gain_curve_poly_correct(ele,gc_param_dat):
+    # ele : elevation in degrees.
+    dpfu,a0,a1,a2 = gc_param_dat
+    return  dpfu*(a2*ele**2 + a1*ele + a0)
 
 def scale_data(file_name, save_name):
     # For scaling data in bl1 
@@ -176,15 +182,15 @@ def scale_data(file_name, save_name):
         scale_fact = 1
         if 1 in bl_st_l:
             ant1_source_elev = (get_tar_altaz(obs_skycrd, data_table[i]['DATE'], obs_tele = 'kvntamna').alt).value
-            sf_ant1 = gain_curve_poly(ant1_source_elev, antab_gc1) / gain_curve_poly(ant1_source_elev, wycjupgc1)
+            sf_ant1 = gain_curve_poly_correct(ant1_source_elev, antab_gc1) / gain_curve_poly_correct(ant1_source_elev, wycjupgc1)
             scale_fact = np.sqrt(sf_ant1) * scale_fact
         if 2 in bl_st_l:
             ant2_source_elev = (get_tar_altaz(obs_skycrd, data_table[i]['DATE'], obs_tele = 'kvnulsan').alt).value
-            sf_ant2 = gain_curve_poly(ant2_source_elev, antab_gc2) / gain_curve_poly(ant2_source_elev, wycjupgc2)
+            sf_ant2 = gain_curve_poly_correct(ant2_source_elev, antab_gc2) / gain_curve_poly_correct(ant2_source_elev, wycjupgc2)
             scale_fact = np.sqrt(sf_ant2) * scale_fact
         if 3 in bl_st_l:
             ant3_source_elev = (get_tar_altaz(obs_skycrd, data_table[i]['DATE'], obs_tele = 'kvnyonsei').alt).value
-            sf_ant3 = gain_curve_poly(ant3_source_elev, antab_gc3) / gain_curve_poly(ant3_source_elev, wycjupgc3)
+            sf_ant3 = gain_curve_poly_correct(ant3_source_elev, antab_gc3) / gain_curve_poly_correct(ant3_source_elev, wycjupgc3)
             scale_fact = np.sqrt(sf_ant3) * scale_fact * obsepochif[1]
         #else:
         #    scale_fact = 1
